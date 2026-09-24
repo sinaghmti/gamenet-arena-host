@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameNet ARENA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #05010f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* گرید سایبرپانک */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.08) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg) translateY(200px) scale(2);
+            animation: gridMove 5s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 50px; }
+        }
+
+        /* هاله‌های رنگی */
+        body::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 204, 0.25), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 212, 255, 0.25), transparent 40%),
+                radial-gradient(circle at 50% 100%, rgba(123, 0, 255, 0.2), transparent 50%);
+            animation: glowShift 6s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes glowShift {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* ذرات شناور */
+        .particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particles span {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00d4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            from { transform: translateY(100vh) scale(0); opacity: 0; }
+            20% { opacity: 1; }
+            to { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+
+        /* خط اسکن */
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00d4ff, #ff00cc, transparent);
+            box-shadow: 0 0 20px #00d4ff;
+            animation: scan 4s linear infinite;
+            z-index: 3;
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* کارت اصلی */
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 50px 45px;
+            background: rgba(10, 5, 30, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 2px solid transparent;
+            background-image:
+                linear-gradient(rgba(10, 5, 30, 0.9), rgba(10, 5, 30, 0.9)),
+                linear-gradient(135deg, #00d4ff, #ff00cc, #00d4ff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            border-radius: 24px;
+            box-shadow:
+                0 0 40px rgba(0, 212, 255, 0.4),
+                0 0 80px rgba(255, 0, 204, 0.2),
+                inset 0 0 60px rgba(0, 212, 255, 0.05);
+            max-width: 560px;
+            width: 92%;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* گوشه‌های تزئینی */
+        .container::before,
+        .container::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00d4ff;
+            box-shadow: 0 0 15px #00d4ff;
+        }
+
+        .container::before {
+            top: -2px; right: -2px;
+            border-left: none; border-bottom: none;
+            border-radius: 0 24px 0 0;
+        }
+
+        .container::after {
+            bottom: -2px; left: -2px;
+            border-right: none; border-top: none;
+            border-radius: 0 0 0 24px;
+        }
+
+        .logo {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #00d4ff;
+            box-shadow: 0 0 25px #00d4ff, 0 0 50px rgba(0, 212, 255, 0.5);
+            animation: logoPulse 2.5s ease-in-out infinite;
+            display: block;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 25px #00d4ff, 0 0 50px rgba(0, 212, 255, 0.5); transform: scale(1); }
+            50% { box-shadow: 0 0 40px #ff00cc, 0 0 70px rgba(255, 0, 204, 0.6); transform: scale(1.03); }
+        }
+
+        .title {
+            font-size: 2.4em;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00d4ff, #ff00cc, #7b00ff, #00d4ff);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+            margin-bottom: 6px;
+            letter-spacing: 2px;
+            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
+        }
+
+        @keyframes shine {
+            to { background-position: 300% center; }
+        }
+
+        .subtitle {
+            color: #00d4ff;
+            font-size: 0.95em;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            display: inline-block;
+            padding: 5px 16px;
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            border-radius: 20px;
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .divider {
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, #ff00cc, transparent);
+            margin: 18px auto 22px;
+            border-radius: 2px;
+            box-shadow: 0 0 15px #00d4ff;
+        }
+
+        /* پیام وضعیت - همون msgs اصلی */
+        #msgs {
+            color: #00ff88 !important;
+            font-size: 1.15em !important;
+            font-weight: bold !important;
+            margin: 25px 0 !important;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
+            animation: msgPulse 1.8s ease-in-out infinite;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+            padding: 0 10px;
+        }
+
+        @keyframes msgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.55; }
+        }
+
+        /* اسپینر لودینگ */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 3px solid rgba(0, 255, 136, 0.3);
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        .status-row .dot {
+            width: 9px;
+            height: 9px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff88;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .developer {
+            margin-top: 22px;
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        .developer .role {
+            display: block;
+            font-size: 0.75em;
+            color: #ff00cc;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 0, 204, 0.8);
+            margin-bottom: 5px;
+        }
+
+        .developer .name {
+            display: block;
+            font-size: 1.5em;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 3px;
+            text-shadow:
+                0 0 15px rgba(0, 212, 255, 0.8),
+                0 0 30px rgba(0, 212, 255, 0.5);
+            animation: namePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes namePulse {
+            0%, 100% { text-shadow: 0 0 15px rgba(0, 212, 255, 0.8), 0 0 30px rgba(0, 212, 255, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(255, 0, 204, 0.9), 0 0 40px rgba(255, 0, 204, 0.6); }
+        }
+
+        @media (max-width: 480px) {
+            .title { font-size: 1.7em; }
+            .logo { width: 85px; height: 85px; }
+            .container { padding: 35px 20px; }
+            .developer .name { font-size: 1.2em; }
+            .subtitle { font-size: 0.8em; }
+            #msgs { font-size: 1em !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ذرات شناور -->
+    <div class="particles">
+        <span style="left: 10%; animation-duration: 8s; animation-delay: 0s;"></span>
+        <span style="left: 25%; animation-duration: 10s; animation-delay: 2s;"></span>
+        <span style="left: 40%; animation-duration: 7s; animation-delay: 1s;"></span>
+        <span style="left: 60%; animation-duration: 9s; animation-delay: 3s; background: #ff00cc; box-shadow: 0 0 10px #ff00cc;"></span>
+        <span style="left: 75%; animation-duration: 11s; animation-delay: 1.5s;"></span>
+        <span style="left: 90%; animation-duration: 8s; animation-delay: 4s; background: #ff00cc; box-shadow: 0 0 10px #ff00cc;"></span>
+    </div>
+
+    <!-- خط اسکن -->
+    <div class="scanline"></div>
+
+    <div class="container">
+        <!-- لوگو: اگر نداری این خط رو حذف کن -->
+        <img src="logo.png" alt="Logo" class="logo">
+
+        <h1 class="title">GameNet ARENA</h1>
+        <p class="subtitle">مرکز PS4 و PS5</p>
+
+        <div class="divider"></div>
+
+        <!-- ⚠️ این همون msgs اصلیه - دست نزن -->
+        <h1 id="msgs">
+            Loading GoldHEN v2.4b18.12... Please Wait
+            <span class="loader"></span>
+        </h1>
+
+        <div class="status-row">
+            <span class="dot"></span>
+            <span>لطفاً صبر کنید، در حال بارگذاری اکسپلویت...</span>
+        </div>
+
+        <div class="developer">
+            <span class="role">Developer</span>
+            <span class="name">Sinaghmti</span>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!--  ⚠️ از اینجا به بعد منطق اکسپلویت دست نخورده  -->
+    <!-- ============================================ -->
+    <script>
+        var uaFull = navigator.userAgent;
+        var match = uaFull.match(/PlayStation 4[ /]([\d.]+)/i);
+        var isPS4 = match !== null;
+        var fwVersion = isPS4 ? match[1] : "Unknown";
+        var fwNum = parseFloat(fwVersion);
+
+        function onScriptError() {
+            msgs.innerHTML = "Content not Found! - Clear Browser Data and Re-Install Cache ...";
+        }
+
+        if (!isPS4) {
+            document.addEventListener("DOMContentLoaded", () => {
+                msgs.innerHTML = "Only for PS4 with Firmware 5.05 and 7.00 to 13.52";
+            });
+        } else {
+            if (window.applicationCache.status == '0') {
+                if (fwNum == 5.05 || fwNum == 5.07) {
+                    window.location.replace("cache505.html");
+                } else if (fwNum >= 7.00 && fwNum <= 8.52) {
+                    window.location.replace("cache700.html");
+                } else if (fwNum >= 9.00 && fwNum <= 9.60) {
+                    window.location.replace("cache900.html");
+                } else if (fwNum >= 10.00 && fwNum <= 11.02) {
+                    window.location.replace("cachecss.html");
+                } else if (fwNum >= 11.50 && fwNum <= 13.52) {
+                    window.location.replace("cacheslopkit.html");
+                } else {
+                    document.addEventListener("DOMContentLoaded", () => {
+                        msgs.innerHTML = 'Unsupported Firmware: <span style="color: red;">' + fwVersion + '</span>';
+                    });
+                }
+            } else {
+                if (fwNum == 5.05 || fwNum == 5.07) {
+                    var script = document.createElement('script');
+                    script.src = "505/exploit.js";
+                    script.onerror = onScriptError;
+                    document.head.appendChild(script);
+                }
+                else if (fwNum >= 7.00 && fwNum <= 8.52) {
+                    var script = document.createElement('script');
+                    script.type = 'module';
+                    script.src = "700/alert.js";
+                    script.onerror = onScriptError;
+                    document.head.appendChild(script);
+                }
+                else if (fwNum >= 9.00 && fwNum <= 9.60) {
+                    var script = document.createElement('script');
+                    script.type = 'module';
+                    script.src = "900/alert.js";
+                    script.onerror = onScriptError;
+                    document.head.appendChild(script);
+                }
+                else if (fwNum >= 10.00 && fwNum <= 11.02) {
+                    var script = document.createElement('script');
+                    script.src = "css/main.js";
+                    script.onerror = onScriptError;
+                    script.onload = function () {
+                        setTimeout(function () {
+                            doJb();
+                        }, 500);
+                    };
+                    document.head.appendChild(script);
+                }
+                else if (fwNum >= 11.50 && fwNum <= 12.02) {
+                    var script = document.createElement('script');
+                    script.type = 'module';
+                    script.src = "slopkit/chain_lapse.js";
+                    script.onerror = onScriptError;
+                    document.head.appendChild(script);
+                }
+                else if (fwNum >= 12.50 && fwNum <= 13.00) {
+                    var script = document.createElement('script');
+                    script.type = 'module';
+                    script.src = "slopkit/chain_poops.js";
+                    script.onerror = onScriptError;
+                    document.head.appendChild(script);
+                }
+                else if (fwNum >= 13.02 && fwNum <= 13.52) {
+                    var script = document.createElement('script');
+                    script.type = 'module';
+                    script.src = "slopkit/jb.js?v=10";
+                    script.onerror = onScriptError;
+                    document.head.appendChild(script);
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
